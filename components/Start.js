@@ -61,7 +61,7 @@ const Start = ({ navigation }) => {
             <TouchableOpacity
               style={[styles.colorButton, styles.buttonBgColor4]}
               onPress={() => {
-                setBgColor(styles.buttonBgColor3.backgroundColor);
+                setBgColor(styles.buttonBgColor4.backgroundColor);
               }}
             />
           </View>
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   colorButton: {
     width: 40,
     height: 40,
-    borderRadius: "25",
+    borderRadius: 25,
   },
   buttonBgColor1: {
     backgroundColor: "#090C08",
