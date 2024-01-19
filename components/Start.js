@@ -8,15 +8,36 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
+
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 // Background Image
 const image = require("../img/background-img.png");
 
 const Start = ({ navigation }) => {
+  const auth = getAuth();
+
   // Initiating User's name and Chosen Background Color for Chat Screen
   const [name, setName] = useState("");
   const [bgColor, setBgColor] = useState("");
+
+  // Will Sign in user anonymously into firestore data base, saving user's settings
+  const signInUser = () => {
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate("Chat", {
+          id: result.user.uid,
+          name: name,
+          bgColor: bgColor,
+        });
+        Alert.alert("Signed in Successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Unable to sign in, try again later.");
+      });
+  };
 
   return (
     <ImageBackground source={image} style={styles.image}>
@@ -71,12 +92,7 @@ const Start = ({ navigation }) => {
 
         {/* Start Chatting Button */}
 
-        <TouchableOpacity
-          style={styles.chatButton}
-          onPress={() => {
-            navigation.navigate("Chat", { name: name, bgColor: bgColor });
-          }}
-        >
+        <TouchableOpacity style={styles.chatButton} onPress={signInUser}>
           <Text style={styles.buttonText}>Start Chatting</Text>
         </TouchableOpacity>
       </View>
