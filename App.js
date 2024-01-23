@@ -7,26 +7,24 @@ import {
   disableNetwork,
   enableNetwork,
 } from "firebase/firestore";
-import { useNetInfo } from "@react-native-community/netinfo";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { initializeAuth } from "firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import useEffect from "@react-navigation/native";
+import { useEffect } from "react";
 import { LogBox, Alert } from "react-native";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 const Stack = createNativeStackNavigator();
 
-const App = () => {
-  LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
+const App = () => {
   const connectionStatus = useNetInfo();
 
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
-      Alert.alert("Connection lost!");
+      Alert.alert("Connection Lost!");
       disableNetwork(db);
     } else if (connectionStatus.isConnected === true) {
       enableNetwork(db);

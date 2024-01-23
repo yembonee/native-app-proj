@@ -1,5 +1,5 @@
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
 import {
   addDoc,
@@ -9,7 +9,6 @@ import {
   query,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { InputToolbar } from "react-native-gifted-chat";
 
 const Chat = ({ route, navigation, db, isConnected }) => {
   // Imported name and Background color from start page
@@ -21,10 +20,16 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
 
+  const loadCachedMessages = async () => {
+    const cachedMessages = (await AsyncStorage.getItem("messages")) || "[]";
+    setMessages(JSON.parse(cachedMessages));
+  };
+
   let unsubMessages;
 
   useEffect(() => {
     navigation.setOptions({ title: name });
+
     if (isConnected === true) {
       if (unsubMessages) unsubMessages();
       unsubMessages = null;
@@ -42,14 +47,18 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         cacheMessages(newMessages);
         setMessages(newMessages);
       });
-      return () => {
-        if (unsubMessages) unsubMessages();
-      };
-    }
+    } else loadCachedMessages();
+
+    // Clean up function
+    return () => {
+      if (unsubMessages) {
+        unsubMessages();
+      }
+    };
   }, [isConnected]);
 
   const renderInputToolBar = (props) => {
-    if (isConnected) return <InputToolbar {...props} />;
+    if (isConnected === true) return <InputToolbar {...props} />;
     else return null;
   };
 
@@ -59,11 +68,6 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     } catch (error) {
       console.log(error.message);
     }
-  };
-
-  const loadCachedMessages = async () => {
-    const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
-    setMessages(JSON.parse(cachedMessages));
   };
 
   // Customizes chat bubbles styling
@@ -86,7 +90,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       {isConnected === true ? (
         <GiftedChat
-          renderInputToolbar={renderInputToolbar}
+          renderInputToolBar={renderInputToolBar}
           renderBubble={renderBubble}
           messages={messages}
           onSend={(messages) => onSend(messages)}
