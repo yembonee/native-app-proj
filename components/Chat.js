@@ -16,24 +16,21 @@ const Chat = ({ route, navigation, db, isConnected }) => {
 
   // Sets value of messages, past and new messages
   const [messages, setMessages] = useState([]);
+
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
 
-  const loadCachedMessages = async () => {
-    const cachedMessages = (await AsyncStorage.getItem("messages")) || "[]";
-    setMessages(JSON.parse(cachedMessages));
-  };
+  useEffect(() => {
+    navigation.setOptions({ title: name });
+  }, []);
 
   let unsubMessages;
 
   useEffect(() => {
-    navigation.setOptions({ title: name });
-
     if (isConnected === true) {
       if (unsubMessages) unsubMessages();
       unsubMessages = null;
-
       const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
       unsubMessages = onSnapshot(q, (documentSnapshot) => {
         let newMessages = [];
@@ -47,27 +44,35 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         cacheMessages(newMessages);
         setMessages(newMessages);
       });
-    } else loadCachedMessages();
+    } else {
+      loadCachedMessages();
+    }
 
     // Clean up function
     return () => {
-      if (unsubMessages) {
-        unsubMessages();
-      }
+      if (unsubMessages) unsubMessages();
     };
   }, [isConnected]);
 
-  const renderInputToolBar = (props) => {
-    if (isConnected === true) return <InputToolbar {...props} />;
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
     else return null;
   };
 
   const cacheMessages = async (messagesToCache) => {
     try {
-      await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
+      await AsyncStorage.setItem(
+        "chat_messages",
+        JSON.stringify(messagesToCache)
+      );
     } catch (error) {
-      console.log(error.message);
+      console.log("Error caching messages", error.message);
     }
+  };
+
+  const loadCachedMessages = async () => {
+    const cachedMessages = (await AsyncStorage.getItem("chat_messages")) || [];
+    setMessages(JSON.parse(cachedMessages));
   };
 
   // Customizes chat bubbles styling
@@ -88,18 +93,16 @@ const Chat = ({ route, navigation, db, isConnected }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
-      {isConnected === true ? (
-        <GiftedChat
-          renderInputToolBar={renderInputToolBar}
-          renderBubble={renderBubble}
-          messages={messages}
-          onSend={(messages) => onSend(messages)}
-          user={{
-            _id: route.params.id,
-            name: name,
-          }}
-        />
-      ) : null}
+      <GiftedChat
+        messages={messages}
+        renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: route.params.id,
+          name: name,
+        }}
+      />
       {Platform.OS === "android" ? (
         <KeyboardAvoidingView behavior="height" />
       ) : null}
