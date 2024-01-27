@@ -19,16 +19,19 @@ const Chat = ({ route, navigation, db, isConnected, storage, userID }) => {
   // Sets value of messages, past and new messages
   const [messages, setMessages] = useState([]);
 
+  //adds newest message to database
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
 
+  // sets title of chat screen as user's inputted name
   useEffect(() => {
     navigation.setOptions({ title: name });
   }, []);
 
   let unsubMessages;
 
+  //Runs anytime user sends message, adds information to database
   useEffect(() => {
     if (isConnected === true) {
       if (unsubMessages) unsubMessages();
@@ -56,11 +59,13 @@ const Chat = ({ route, navigation, db, isConnected, storage, userID }) => {
     };
   }, [isConnected]);
 
+  // Removes input/chat bar when disconnected form internet
   const renderInputToolbar = (props) => {
     if (isConnected) return <InputToolbar {...props} />;
     else return null;
   };
 
+  //Caches messages to database
   const cacheMessages = async (messagesToCache) => {
     try {
       await AsyncStorage.setItem(
@@ -72,15 +77,18 @@ const Chat = ({ route, navigation, db, isConnected, storage, userID }) => {
     }
   };
 
+  // Loads the cached messages from database
   const loadCachedMessages = async () => {
     const cachedMessages = (await AsyncStorage.getItem("chat_messages")) || [];
     setMessages(JSON.parse(cachedMessages));
   };
 
+  //Loads CustomActions.js
   const renderCustomActions = (props) => {
     return <CustomActions storage={storage} userID={userID} {...props} />;
   };
 
+  // Sends location of user, saves data in database using longitude and latitude
   const renderCustomView = (props) => {
     const { currentMessage } = props;
     if (currentMessage.location) {

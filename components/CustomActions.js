@@ -42,6 +42,7 @@ const CustomActions = ({
     );
   };
 
+  // Code to send image and saves data from user sent image
   const uploadAndSendImage = async (imageURI) => {
     const uniqueRefString = generateReference(imageURI);
     const newUploadRef = ref(storage, uniqueRefString);
@@ -52,7 +53,7 @@ const CustomActions = ({
       onSend({ image: imageURL });
     });
   };
-
+  // allows user to choose an image from their library and send it
   const pickImage = async () => {
     let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissions?.granted) {
@@ -61,7 +62,7 @@ const CustomActions = ({
       else Alert.alert("Permissions haven't been granted.");
     }
   };
-
+  // allows user to take a picture from their camera and send it
   const takePhoto = async () => {
     let permissions = await ImagePicker.requestCameraPermissionsAsync();
     if (permissions?.granted) {
@@ -70,6 +71,8 @@ const CustomActions = ({
       else Alert.alert("Permissions haven't been granted.");
     }
   };
+
+  // allows user to get thier location and send it
   const getLocation = async () => {
     let permissions = await Location.requestForegroundPermissionsAsync();
 

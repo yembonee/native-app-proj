@@ -21,6 +21,7 @@ const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
+  // Initializing internet connection
   const connectionStatus = useNetInfo();
 
   useEffect(() => {
@@ -45,8 +46,9 @@ const App = () => {
   };
 
   const app = initializeApp(firebaseConfig);
-
+  // database initialization
   const db = getFirestore(app);
+  // database storage initialization
   const storage = getStorage(app);
 
   return (
