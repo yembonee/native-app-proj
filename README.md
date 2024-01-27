@@ -8,7 +8,7 @@
 <p align="center"><sub>Chat App Gif</sub></p>
 <br>
 
-<p align="center"><img src="" alt="gif of the app's functionality"></p>
+<p align="center"><img width='220' src="https://github.com/yembonee/native-app-proj/blob/master/assets/showcase-project.gif" alt="gif of the app's functionality"></p>
 
 <br>
 
